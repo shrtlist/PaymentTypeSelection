@@ -8,7 +8,6 @@ import SwiftUI
 
 struct PaymentInfoView: View {
     @ObservedObject var model: Model
-    @State var paymentTypes: [PaymentType] = []
     @State private var searchText = ""
     let onSelect: (PaymentType) -> Void
 
@@ -35,7 +34,7 @@ struct PaymentInfoView: View {
                 ProgressView()
                     .frame(maxWidth: .infinity, alignment: .center)
             } else {
-                List(searchResults, id: \ .id) { paymentType in
+                List(searchResults) { paymentType in
                     HStack {
                         Text(paymentType.name)
                         Spacer()
@@ -60,18 +59,18 @@ struct PaymentInfoView: View {
         )
         .onAppear() {
             Task {
-                paymentTypes = try await model.fetchPaymentTypes()
+                await model.fetchPaymentTypes()
             }
         }
         .refreshable {
             Task {
-                paymentTypes = try await model.fetchPaymentTypes()
+                await model.fetchPaymentTypes()
             }
         }
     }
 
     var searchResults: [PaymentType] {
-        let contactAddresses = paymentTypes
+        let contactAddresses = model.paymentTypes
 
         if searchText.isEmpty {
             return contactAddresses

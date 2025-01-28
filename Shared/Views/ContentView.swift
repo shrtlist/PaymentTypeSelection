@@ -15,7 +15,6 @@
 import SwiftUI
 
 struct ContentView: View {
-    @Environment(\.scenePhase) var scenePhase
     @StateObject private var model = Model()
     @State var showPaymentModal = false
     @State var showFinishModal = false

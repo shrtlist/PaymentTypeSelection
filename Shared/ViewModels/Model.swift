@@ -10,6 +10,7 @@ import Combine
 
 @MainActor
 class Model: ObservableObject {
+    @Published var paymentTypes: [PaymentType] = []
     @Published var timerValue: Int
     var selectedPaymentType: PaymentType? = nil
     let processDurationInSeconds: Int = 60
@@ -38,20 +39,18 @@ class Model: ObservableObject {
         timerValue = processDurationInSeconds
     }
 
-    func fetchPaymentTypes() async throws -> [PaymentType] {
-        return try await withCheckedThrowingContinuation() { continuation in
-            guard !isLoading else { return }
-            isLoading = true
+    func fetchPaymentTypes() async {
+        guard !isLoading else { return }
+        isLoading = true
 
-            repository.getTypes { result in
-                self.isLoading = false
-                switch result {
-                case .success(let types):
-                    continuation.resume(returning: types)
-                case .failure(let error):
-                    print("Error fetching payment types: \(error)")
-                    continuation.resume(throwing: error)
-                }
+        repository.getTypes { result in
+            self.isLoading = false
+            switch result {
+            case .success(let types):
+                self.paymentTypes = types
+            case .failure(let error):
+                self.paymentTypes = []
+                print("Error fetching payment types: \(error)")
             }
         }
     }
